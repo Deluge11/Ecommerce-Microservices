@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Authentication_Infrastructure.Entities
+namespace Authentication_Core.Entities
 {
     public class Role
     {

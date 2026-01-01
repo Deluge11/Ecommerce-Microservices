@@ -1,4 +1,4 @@
-﻿using Authentication_Infrastructure.Entities;
+﻿using Authentication_Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Channels;
 
@@ -30,6 +30,10 @@ namespace Authentication_Infrastructure.ApplicationDbContext
                 .HasMany(r => r.Permissions)
                 .WithMany(p => p.Roles)
                 .UsingEntity(rp => rp.ToTable("RolePermissions"));
+
+            modelBuilder.Entity<Account>()
+            .HasIndex(a => a.Email)
+            .IsUnique();
 
             base.OnModelCreating(modelBuilder);
 

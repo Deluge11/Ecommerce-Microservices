@@ -1,9 +1,7 @@
 ﻿using Authentication_Core.Interfaces;
 using Authentication_Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
-
-
-
+using System.Linq.Expressions;
 
 namespace Authentication_Core.Repositories
 {
@@ -20,18 +18,23 @@ namespace Authentication_Core.Repositories
         private DbSet<TEntity> _Entity { get; }
 
 
-        public async Task Add(TEntity entity)
+        public async Task<TEntity> Add(TEntity entity)
         {
             await _Entity.AddAsync(entity);
-        }
-        public async Task<IEnumerable<TEntity>> GetAll()
-        {
-            return await _Entity.ToListAsync();
+            return entity;
         }
 
+        public async Task<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _Entity.SingleOrDefaultAsync(predicate);
+        }
         public async Task<TEntity> GetById(int id)
         {
             return await _Entity.FindAsync(id);
-        } 
+        }
+        public async Task<bool> Exists(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _Entity.AnyAsync(predicate);
+        }
     }
 }
