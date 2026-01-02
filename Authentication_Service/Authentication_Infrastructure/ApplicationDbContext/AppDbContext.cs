@@ -24,16 +24,31 @@ namespace Authentication_Infrastructure.ApplicationDbContext
             modelBuilder.Entity<Account>()
                 .HasMany(a => a.Roles)
                 .WithMany(r => r.Accounts)
-                .UsingEntity(ar => ar.ToTable("AccountRoles"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "AccountRole", 
+                    j => j.HasOne<Role>().WithMany().HasForeignKey("RoleId"),
+                    j => j.HasOne<Account>().WithMany().HasForeignKey("AccountId"),
+                    j =>
+                    {
+                        j.HasIndex("AccountId", "RoleId").IsUnique();
+                    });
 
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Permissions)
                 .WithMany(p => p.Roles)
-                .UsingEntity(rp => rp.ToTable("RolePermissions"));
+                .UsingEntity<Dictionary<string, object>>(
+                    "RolePermission", 
+                    j => j.HasOne<Permission>().WithMany().HasForeignKey("PermissionId"),
+                    j => j.HasOne<Role>().WithMany().HasForeignKey("RoleId"),
+                    j =>
+                    {
+                        j.HasIndex("RoleId", "PermissionId").IsUnique();
+                    });
 
             modelBuilder.Entity<Account>()
             .HasIndex(a => a.Email)
             .IsUnique();
+
 
             base.OnModelCreating(modelBuilder);
 

@@ -29,8 +29,11 @@ namespace Authentication_Application.Accounts.Commands.Register
 
         public async Task<string> Handle(RegisterCommand request, CancellationToken ct)
         {
-            var account = await UnitOfWork.Accounts.Exists(e => e.Email == request.email);
-            if (account != null)
+            if (request.password != request.confirmPassword)
+                return null;
+
+            var accountExists = await UnitOfWork.Accounts.Exists(e => e.Email == request.email);
+            if (accountExists)
                 return null;
 
             var hashedPassword = IdentityService.GenerateHash(request.password);

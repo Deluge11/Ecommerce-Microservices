@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace Authentication_Application.Accounts.Commands.Register
 {
-    public record RegisterCommand(string name, string email, string password) : IRequest<string>;
+    public record RegisterCommand(string name, string email, string password,string confirmPassword) : IRequest<string>;
 }

@@ -51,7 +51,7 @@ namespace JWT_API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDTO registerDTO)
         {
-            var result = await _mediator.Send(new RegisterCommand(registerDTO.Name, registerDTO.Email, registerDTO.Password));
+            var result = await _mediator.Send(new RegisterCommand(registerDTO.Name, registerDTO.Email, registerDTO.Password, registerDTO.ComformPassword));
             return result != null ? Ok(result) : BadRequest("Something went wrong");
         }
     }
