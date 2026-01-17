@@ -94,6 +94,7 @@ builder.Services.AddScoped<UserData>();
 
 builder.Services.AddScoped<AuthorizeHelper>();
 
+
 builder.Services.AddMemoryCache();
 
 builder.Services.AddSingleton<TimerService>(provider =>

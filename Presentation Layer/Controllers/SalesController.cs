@@ -26,8 +26,7 @@ public class SalesController : ControllerBase
     [HttpGet("my-sales")]
     public async Task<IActionResult> GetMySales([FromQuery] SalesState state, [FromQuery] int lastIdSeen)
     {
-        int userId = User.GetUserId();
-        var sales = await SalesBusiness.GetMySales(state, lastIdSeen,userId);
+        var sales = await SalesBusiness.GetMySales(state, lastIdSeen, User.GetUserId());
         return sales != null ?
             Ok(sales) : NotFound();
     }
@@ -49,8 +48,7 @@ public class SalesController : ControllerBase
     [HttpGet("profits")]
     public async Task<IActionResult> GetMySalesProfits()
     {
-        int userId = User.GetUserId();
-        var price = await SalesBusiness.GetSalesProfits(userId);
+        var price = await SalesBusiness.GetSalesProfits(User.GetUserId());
         return price != null ?
             Ok(price) : NotFound();
     }

@@ -25,8 +25,7 @@ public class PromocodeController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddPromoCode(AddPromocode promoCode)
     {
-        int userId = User.GetUserId();
-        var result = await PromoCodeBusiness.AddPromoCode(promoCode, userId);
+        var result = await PromoCodeBusiness.AddPromoCode(promoCode, User.GetUserId());
         return result.Success ?
             Ok() : BadRequest(result.ErrorMessage);
     }
@@ -36,8 +35,7 @@ public class PromocodeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMyPromoCodes()
     {
-        int userId = User.GetUserId();
-        var result = await PromoCodeBusiness.GetPromoCodes(userId);
+        var result = await PromoCodeBusiness.GetPromoCodes(User.GetUserId());
         return result == null || result.Count < 1 ?
             BadRequest() : Ok(result);
     }
@@ -47,8 +45,7 @@ public class PromocodeController : ControllerBase
     [HttpPatch("{id}")]
     public async Task<IActionResult> TogglePromoCode(int id)
     {
-        int userId = User.GetUserId();
-        return await PromoCodeBusiness.TogglePromocode(id, userId) ?
+        return await PromoCodeBusiness.TogglePromocode(id, User.GetUserId()) ?
             Ok() : BadRequest();
     }
 

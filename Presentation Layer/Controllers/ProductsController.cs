@@ -1,10 +1,8 @@
 ﻿using Presentation_Layer.Authorization;
 using Enums;
 using Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Business_Layer.Business;
-using System.Numerics;
 using Presentation_Layer.Extensions;
 
 
@@ -91,8 +89,7 @@ public class ProductsController : ControllerBase
     [HttpGet("my-products")]
     public async Task<ActionResult<List<ProductCatalog>>> GetMyProducts()
     {
-        int userId = User.GetUserId();
-        var products = await ProductsBusiness.GetMyProducts(userId);
+        var products = await ProductsBusiness.GetMyProducts(User.GetUserId());
         return products != null ?
             Ok(products) : NotFound();
     }
@@ -101,8 +98,7 @@ public class ProductsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<int>> InsertProduct(InsertProductRequest product)
     {
-        int userId = User.GetUserId();
-        var result = await ProductsBusiness.InsertProduct(product, userId);
+        var result = await ProductsBusiness.InsertProduct(product, User.GetUserId());
         return result.Success ?
             Ok(result) : BadRequest(result.ErrorMessage);
     }
@@ -113,8 +109,7 @@ public class ProductsController : ControllerBase
     [HttpPost("add-quantity")]
     public async Task<IActionResult> AddStockQuantity(AddProductQuantity request)
     {
-        int userId = User.GetUserId();
-        return await ProductsBusiness.AddStockQuantity(request, userId) ?
+        return await ProductsBusiness.AddStockQuantity(request, User.GetUserId()) ?
             Ok() : BadRequest();
     }
 
@@ -124,8 +119,7 @@ public class ProductsController : ControllerBase
     [HttpPost("{productId}")]
     public async Task<ActionResult> UploadImage(List<IFormFile> images, int productId)
     {
-        int userId = User.GetUserId();
-        var result = await ProductsBusiness.UploadImage(images, productId, userId);
+        var result = await ProductsBusiness.UploadImage(images, productId, User.GetUserId());
         return result.Success ?
             Ok(result.Data) : BadRequest(result.ErrorMessage);
     }
@@ -136,8 +130,7 @@ public class ProductsController : ControllerBase
     [HttpPut]
     public async Task<ActionResult> UpdateProduct(UpdateProductRequest product)
     {
-        int userId = User.GetUserId();
-        return await ProductsBusiness.UpdateProduct(product, userId) ?
+        return await ProductsBusiness.UpdateProduct(product, User.GetUserId()) ?
             Ok() : BadRequest("Cant access this product");
 
     }
@@ -148,8 +141,7 @@ public class ProductsController : ControllerBase
     [HttpPatch("image/{productId}")]
     public async Task<ActionResult> SetMainImage(int productId, [FromQuery] int imageId)
     {
-        int userId = User.GetUserId();
-        return await ProductsBusiness.SetProductMainImage(productId, imageId, userId) ?
+        return await ProductsBusiness.SetProductMainImage(productId, imageId, User.GetUserId()) ?
             Ok() : BadRequest();
     }
 
@@ -159,8 +151,7 @@ public class ProductsController : ControllerBase
     [HttpPatch("{productId}")]
     public async Task<ActionResult> UpdateProductState(int productId, ProductState state)
     {
-        int userId = User.GetUserId();
-        return await ProductsBusiness.UpdateProductState(productId, state, userId) ?
+        return await ProductsBusiness.UpdateProductState(productId, state, User.GetUserId()) ?
             Ok() : BadRequest();
     }
 

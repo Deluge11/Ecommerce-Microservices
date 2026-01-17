@@ -30,8 +30,7 @@ public class PayPalController : ControllerBase
     [HttpPost("create-order")]
     public async Task<IActionResult> CreateOrder()
     {
-        int userId = User.GetUserId();
-        var result = await PayPalBusiness.CreateOrder(userId);
+        var result = await PayPalBusiness.CreateOrder(User.GetUserId());
 
         if (result.Success)
         {

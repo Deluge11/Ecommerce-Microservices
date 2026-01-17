@@ -27,7 +27,7 @@ public class RabbitmqConsumer : BackgroundService
         Channel = await RabbitmqConnection.CreateChannel();
         var consumer = new AsyncEventingBasicConsumer(Channel);
 
-        consumer.ReceivedAsync += async (model, ea) =>
+        consumer.ReceivedAsync += async (obj, eventArgs) =>
         {
             using var scope = _serviceScopeFactory.CreateScope();
 
@@ -35,7 +35,7 @@ public class RabbitmqConsumer : BackgroundService
 
             try
             {
-                var body = ea.Body.ToArray();
+                var body = eventArgs.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var userCreatedMessage = JsonSerializer.Deserialize<UserCreatedEvent>(message);
 
@@ -57,7 +57,7 @@ public class RabbitmqConsumer : BackgroundService
                 {
                     Console.WriteLine($" [x] Message Ack Successfully: {message}");
 
-                    await Channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
+                    await Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
                 }
                 else
                 {
@@ -67,7 +67,7 @@ public class RabbitmqConsumer : BackgroundService
             catch (Exception ex)
             {
                 Console.WriteLine($"Error processing message: {ex.Message}");
-                await Channel.BasicNackAsync(ea.DeliveryTag, multiple: false, false);
+                await Channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, false);
             }
 
         };

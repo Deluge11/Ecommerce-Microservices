@@ -26,8 +26,7 @@ public class CartsController : ControllerBase
     [HttpGet("count")]
     public async Task<ActionResult<int>> GetCartItemsCount()
     {
-        int userId = User.GetUserId();
-        var count = await CartsBusiness.GetCartItemsCount(userId);
+        var count = await CartsBusiness.GetCartItemsCount(User.GetUserId());
         return count != -1 ?
             Ok(count) : BadRequest();
     }
@@ -37,8 +36,7 @@ public class CartsController : ControllerBase
     [HttpGet("items")]
     public async Task<ActionResult<List<CartItemCatalog>>> GetCartItems()
     {
-        int userId = User.GetUserId();
-        var items = await CartsBusiness.GetCartItems(userId);
+        var items = await CartsBusiness.GetCartItems(User.GetUserId());
         return items != null ?
             Ok(items) : BadRequest();
     }
@@ -48,8 +46,7 @@ public class CartsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<decimal>> GetTotalPrice()
     {
-        int userId = User.GetUserId();
-        var totalPrice = await CartsBusiness.GetTotalPrice(userId);
+        var totalPrice = await CartsBusiness.GetTotalPrice(User.GetUserId());
         return totalPrice != -1 ?
             Ok(totalPrice) : BadRequest();
     }

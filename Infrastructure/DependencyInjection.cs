@@ -18,6 +18,7 @@ namespace Infrastructure
             services.AddHostedService<RabbitmqInitializer>();
             services.AddSingleton<RabbitmqPublisher>();
             services.AddHostedService<RabbitmqConsumer>();
+
             services.AddSingleton<IConnectionFactory>(sp =>
             {
                 return new ConnectionFactory()

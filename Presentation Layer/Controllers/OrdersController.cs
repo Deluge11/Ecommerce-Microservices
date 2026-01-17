@@ -32,8 +32,7 @@ public class OrdersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<Order>>> GetMyOrders()
     {
-        int userId = User.GetUserId();
-        var orders = await OrdersBusiness.GetMyOrders(userId);
+        var orders = await OrdersBusiness.GetMyOrders(User.GetUserId());
         return orders != null ?
             Ok(orders) : NotFound();
     }
@@ -44,8 +43,7 @@ public class OrdersController : ControllerBase
     [HttpGet("{orderId}")]
     public async Task<ActionResult<List<OrderDetails>>> GetMyOrderDetails(int orderId)
     {
-        int userId = User.GetUserId();
-        var orders = await OrdersBusiness.GetOrderDetails(orderId,userId);
+        var orders = await OrdersBusiness.GetOrderDetails(orderId, User.GetUserId());
         return orders != null ?
             Ok(orders) : NotFound();
     }
