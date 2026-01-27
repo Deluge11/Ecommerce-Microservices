@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using ConstantsLib.Exchanges;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -63,37 +64,76 @@ namespace Infrastructure.Messaging
         {
             using var channel = await CreateChannel();
 
-            string QueueName = "TestQ";
+            string UserCreatedQueue = "auth.user-created.ecommerce";
+            string ProductCreatedQueue = "catalog.product-created.ecommerce";
+            string ProductUpdatedQueue = "catalog.product-updated.ecommerce";
+
+            var authExchange = new AuthExchange();
+            var catalogExchange = new CatalogExchange();
 
             var arguments = new Dictionary<string, object?>
             {
                 { "x-queue-type", "quorum" }
             };
 
-
+            //Declare Exchange
             await channel.ExchangeDeclareAsync(
-                exchange: "auth.events",
-                type: ExchangeType.Topic,
+                exchange: authExchange.Name,
+                type: authExchange.Type,
                 durable: true
                 );
 
+            await channel.ExchangeDeclareAsync(
+                exchange: catalogExchange.Name,
+                type: catalogExchange.Type,
+                durable: true
+                );
 
+            //Declare Queue
             await channel.QueueDeclareAsync(
-                queue: QueueName,
+                queue: UserCreatedQueue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: arguments
                 );
 
+            await channel.QueueDeclareAsync(
+                queue: ProductCreatedQueue,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: arguments
+                );
+
+            await channel.QueueDeclareAsync(
+                queue: ProductUpdatedQueue,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: arguments
+                );
+
+            //Bind
+            await channel.QueueBindAsync(
+                queue: ProductCreatedQueue,
+                exchange: catalogExchange.Name,
+                routingKey: "catalog.product.created"
+                );
 
             await channel.QueueBindAsync(
-                queue: QueueName,
-                exchange: "auth.events",
+                queue: ProductUpdatedQueue,
+                exchange: catalogExchange.Name,
+                routingKey: "catalog.product.updated"
+                );
+
+            await channel.QueueBindAsync(
+                queue: UserCreatedQueue,
+                exchange: authExchange.Name,
                 routingKey: "auth.user.created"
                 );
 
-            await channel.BasicQosAsync(0, 1, false);
+
 
         }
 

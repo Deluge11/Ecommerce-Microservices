@@ -8,15 +8,16 @@ using System.Text.Json;
 using ConstantsLib.Events;
 using Models;
 using Business_Layer.Business;
+using Business_Layer.JsonService;
 
-public class RabbitmqConsumer : BackgroundService
+public class UserCreatedConsumer : BackgroundService
 {
     private readonly RabbitmqConnection RabbitmqConnection;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private IChannel? Channel;
-    private const string QueueName = "TestQ";
+    private const string QueueName = "auth.user-created.ecommerce";
 
-    public RabbitmqConsumer(RabbitmqConnection rabbitmqConnection, IServiceScopeFactory serviceScopeFactory)
+    public UserCreatedConsumer(RabbitmqConnection rabbitmqConnection, IServiceScopeFactory serviceScopeFactory)
     {
         RabbitmqConnection = rabbitmqConnection;
         _serviceScopeFactory = serviceScopeFactory;
@@ -35,39 +36,37 @@ public class RabbitmqConsumer : BackgroundService
 
             try
             {
-                var body = eventArgs.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var userCreatedMessage = JsonSerializer.Deserialize<UserCreatedEvent>(message);
+                var @event = Deserializer.DeserializeBytesArray<UserCreatedEvent>(eventArgs.Body.ToArray());
 
-                Console.WriteLine($" [x] Received: {message}");
+                Console.WriteLine($" [x] Received: {@event}");
 
-                if (userCreatedMessage == null)
+                if (@event == null)
                 {
                     throw new ArgumentNullException();
                 }
 
                 var user = new User
                 {
-                    id = userCreatedMessage.UserId,
-                    name = userCreatedMessage.Name,
-                    email = userCreatedMessage.Email
+                    id = @event.UserId,
+                    name = @event.Name,
+                    email = @event.Email
                 };
 
                 if (await userBusiness.Add(user))
                 {
-                    Console.WriteLine($" [x] Message Ack Successfully: {message}");
+                    Console.WriteLine($" [x] Message Ack Successfully: {@event}");
 
-                    await Channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                    await Channel.BasicAckAsync(eventArgs.DeliveryTag, false);
                 }
                 else
                 {
-                    throw new Exception();
+                    await Channel.BasicNackAsync(eventArgs.DeliveryTag, false, false);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error processing message: {ex.Message}");
-                await Channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, false);
+                await Channel.BasicNackAsync(eventArgs.DeliveryTag, false, false);
             }
 
         };

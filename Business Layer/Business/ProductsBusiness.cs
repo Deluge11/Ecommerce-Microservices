@@ -1,15 +1,6 @@
 ﻿
 
-using Business_Layer.Sanitizations;
-using Enums;
 using Models;
-using Microsoft.AspNetCore.Http;
-using System.Text.Json;
-using System.Text;
-using Options;
-using System.Net;
-using System.Net.Http.Headers;
-using Microsoft.Extensions.Logging;
 using Data_Layer.Data;
 
 
@@ -24,7 +15,10 @@ public class ProductsBusinees
         ProductData = productData;
     }
 
-
+    public async Task<bool> Add(InsertProductRequest product)
+    {
+        return await ProductData.InsertProduct(product);
+    }
     public async Task<decimal> GetMyProductPriceById(int productId, int userId)
     {
         if (productId < 1)
@@ -43,6 +37,10 @@ public class ProductsBusinees
     public async Task<List<string>> GetProductNames()
     {
         return await ProductData.GetProductNames();
+    }
+    public async Task<bool> Update(UpdateProductRequest product)
+    {
+        return await ProductData.UpdateProduct(product);
     }
 
 }

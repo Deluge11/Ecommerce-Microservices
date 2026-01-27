@@ -6,19 +6,13 @@ using Models;
 
 namespace Data_Layer.Data;
 
-public class ProductData 
+public class ProductData
 {
     public string ConnectionString { get; }
-    public CategoryData CategoryRepo { get; }
 
-    public ProductData
-        (
-        string connectionString,
-        CategoryData categoryRepo
-        )
+    public ProductData(string connectionString)
     {
         ConnectionString = connectionString;
-        CategoryRepo = categoryRepo;
     }
 
     public async Task<List<ProductCatalog>> GetProductsCatalog(int categoryId, int take, int lastSeenId)
@@ -259,36 +253,34 @@ public class ProductData
         }
     }
 
-    public async Task<int> InsertProduct(InsertProductRequest product, int userId)
+    public async Task<bool> InsertProduct(InsertProductRequest product)
     {
-        string query = @"INSERT INTO Products
-                             (name,description,price,categoryId,date,userId,stateId)
-                             Values (@name,@description,@price,@categoryId,GETDATE(),@userId,1);
-                             SELECT CAST(scope_identity() AS int)";
+        string query = @"INSERT INTO Products (id,name,description,price,userId)
+                                     Values (@id,@name,@description,@price,@userId);";
 
 
         using SqlConnection sqlConnect = new SqlConnection(ConnectionString);
         using SqlCommand sqlcommand = new SqlCommand(query, sqlConnect);
 
+        sqlcommand.Parameters.Add(new SqlParameter("@id", SqlDbType.VarChar) { Value = product.id });
         sqlcommand.Parameters.Add(new SqlParameter("@name", SqlDbType.VarChar) { Value = product.name });
-        sqlcommand.Parameters.Add(new SqlParameter("@userId", SqlDbType.VarChar) { Value = userId });
+        sqlcommand.Parameters.Add(new SqlParameter("@userId", SqlDbType.VarChar) { Value = product.userId });
         sqlcommand.Parameters.Add(new SqlParameter("@price", SqlDbType.Decimal) { Value = product.price });
-        sqlcommand.Parameters.Add(new SqlParameter("@categoryId", SqlDbType.Int) { Value = product.categoryId });
         sqlcommand.Parameters.Add(new SqlParameter("@description", SqlDbType.VarChar)
         { Value = product.description ?? (object)DBNull.Value });
 
         try
         {
             await sqlConnect.OpenAsync();
-            return Convert.ToInt32(await sqlcommand.ExecuteScalarAsync());
+            return await sqlcommand.ExecuteNonQueryAsync() > 0;
         }
         catch (Exception)
         {
-            return 0;
+            return false;
         }
 
     }
-    public async Task<bool> UpdateProduct(UpdateProductRequest product, int userId)
+    public async Task<bool> UpdateProduct(UpdateProductRequest product)
     {
         string query = @"UPDATE Products SET 
                             name=@name, price=@price, description=@description 
@@ -300,7 +292,7 @@ public class ProductData
         sqlcommand.Parameters.Add(new SqlParameter("@id", SqlDbType.Int) { Value = product.id });
         sqlcommand.Parameters.Add(new SqlParameter("@name", SqlDbType.VarChar) { Value = product.name });
         sqlcommand.Parameters.Add(new SqlParameter("@price", SqlDbType.Decimal) { Value = product.price });
-        sqlcommand.Parameters.Add(new SqlParameter("@userId", SqlDbType.Int) { Value = userId });
+        sqlcommand.Parameters.Add(new SqlParameter("@userId", SqlDbType.Int) { Value = product.userId });
         sqlcommand.Parameters.Add(new SqlParameter("@description", SqlDbType.VarChar)
         { Value = product.description ?? (object)DBNull.Value });
 

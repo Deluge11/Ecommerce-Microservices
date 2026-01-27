@@ -1,7 +1,5 @@
 ﻿using Presentation_Layer.Authorization;
 using Enums;
-using Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Business_Layer.Business;
 using Presentation_Layer.Extensions;

@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
-    //options.Filters.Add<PermissionBaseAuthorizationFilter>();
+    options.Filters.Add<PermissionBaseAuthorizationFilter>();
 });
 
 
@@ -38,9 +38,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-//builder.Services.AddAntiforgery(options =>
-//  options.HeaderName = "CSRF-TOKEN"
-//);
+
 
 builder.Services.AddOpenApi();
 
@@ -70,7 +68,6 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<ImagesBusiness>();
 builder.Services.AddScoped<CartItemBusiness>();
 builder.Services.AddScoped<CartsBusiness>();
-builder.Services.AddScoped<CategoryBusiness>();
 builder.Services.AddScoped<ProductsBusinees>();
 builder.Services.AddScoped<PayPalBusiness>();
 builder.Services.AddScoped<PromoCodeBusiness>();
@@ -83,7 +80,6 @@ builder.Services.AddSingleton<FileSystem>();
 
 builder.Services.AddScoped<CartItemsData>();
 builder.Services.AddScoped<CartsData>();
-builder.Services.AddScoped<CategoryData>();
 builder.Services.AddScoped<ProductData>();
 builder.Services.AddScoped<PayPalData>();
 builder.Services.AddScoped<PromoCodeData>();
@@ -121,17 +117,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images/ProductImage")),
-    RequestPath = "/Images/ProductImage"
-});
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images/CategoryImage")),
-    RequestPath = "/Images/CategoryImage"
-});
 
 
 //app.UseHttpsRedirection();
